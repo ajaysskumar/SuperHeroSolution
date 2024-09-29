@@ -7,7 +7,7 @@ using SuperHeroApi.Data.Models;
 
 namespace SuperHeroIntegrationTests;
 
-public class SuperHeroApiTests: IClassFixture<WebApplicationFactory<Program>>
+public class SuperHeroApiTests
 {
     [Fact(DisplayName = "Get all superheros API returns all superheroes")]
     public async Task Get_All_SuperHeroes_Returns_List_Of_SuperHero()
