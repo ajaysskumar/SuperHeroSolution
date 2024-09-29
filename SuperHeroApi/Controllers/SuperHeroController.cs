@@ -16,8 +16,14 @@ public class SuperHeroController(ISuperHeroRepository superHeroRepository)
     }
     
     [HttpGet("{id}")]
-    public async Task<SuperHero> GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        return await superHeroRepository.GetSuperHeroById(id);
+        var superHero = await superHeroRepository.GetSuperHeroById(id);
+        if (superHero == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(superHero);
     }
 }

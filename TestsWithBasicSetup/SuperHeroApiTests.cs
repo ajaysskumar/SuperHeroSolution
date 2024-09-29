@@ -42,5 +42,18 @@ public class SuperHeroApiTests: IClassFixture<WebApplicationFactory<Program>>
         superHeroes!.Id.Should().Be(1);
         superHeroes!.SuperName.Should().Be("Batman");
     }
+    
+    [Fact(DisplayName = "Get superhero by invalid Id returns not found")]
+    public async Task Get_By_Invalid_Id_Returns_NotFound()
+    {
+        // Arrange
+        var factory = new WebApplicationFactory<Program>();
+        var htmlClient = factory.CreateClient();
+        // Act
+        var response = await htmlClient.GetAsync("/SuperHero/-1");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
 }
     
