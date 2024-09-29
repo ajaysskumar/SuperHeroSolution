@@ -15,6 +15,7 @@ public class SuperHeroApiTests: IClassFixture<WebApplicationFactory<Program>>
         // Arrange
         var factory = new WebApplicationFactory<Program>();
         var htmlClient = factory.CreateClient();
+        
         // Act
         var response = await htmlClient.GetAsync("/SuperHero");
 
@@ -32,6 +33,7 @@ public class SuperHeroApiTests: IClassFixture<WebApplicationFactory<Program>>
         // Arrange
         var factory = new WebApplicationFactory<Program>();
         var htmlClient = factory.CreateClient();
+        
         // Act
         var response = await htmlClient.GetAsync("/SuperHero/1");
 
@@ -49,6 +51,7 @@ public class SuperHeroApiTests: IClassFixture<WebApplicationFactory<Program>>
         // Arrange
         var factory = new WebApplicationFactory<Program>();
         var htmlClient = factory.CreateClient();
+        
         // Act
         var response = await htmlClient.GetAsync("/SuperHero/-1");
 
