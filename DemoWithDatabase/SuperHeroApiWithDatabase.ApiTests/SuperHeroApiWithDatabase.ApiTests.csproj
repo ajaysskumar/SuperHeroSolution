@@ -7,7 +7,6 @@
 
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
-        <RootNamespace>SuperHeroIntegrationTests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -33,7 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SuperHeroApi\SuperHeroApi.csproj" />
+      <ProjectReference Include="..\SuperHeroApiWithDatabase\SuperHeroApiWithDatabase.csproj" />
     </ItemGroup>
 
 </Project>
