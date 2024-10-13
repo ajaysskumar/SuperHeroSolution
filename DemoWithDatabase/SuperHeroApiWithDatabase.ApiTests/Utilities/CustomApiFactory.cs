@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using SuperHeroApiWithDatabase;
 using SuperHeroApiWithDatabase.Data;
 
-namespace SuperHeroIntegrationTests.Utilities;
+namespace SuperHeroApiWithDatabase.ApiTests.Utilities;
 
 public class CustomApiFactory(SharedFixture sharedFixture) : WebApplicationFactory<Program>
 {

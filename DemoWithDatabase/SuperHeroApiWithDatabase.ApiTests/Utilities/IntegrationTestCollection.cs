@@ -1,4 +1,4 @@
-namespace SuperHeroIntegrationTests.Utilities;
+namespace SuperHeroApiWithDatabase.ApiTests.Utilities;
 
 [CollectionDefinition(nameof(IntegrationTestCollection))]
 public class IntegrationTestCollection : ICollectionFixture<SharedFixture>

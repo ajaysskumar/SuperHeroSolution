@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SuperHeroApiWithDatabase.Data;
 using Testcontainers.PostgreSql;
 
-namespace SuperHeroIntegrationTests.Utilities;
+namespace SuperHeroApiWithDatabase.ApiTests.Utilities;
 
 public class SharedFixture: IAsyncLifetime
 {
@@ -10,7 +10,7 @@ public class SharedFixture: IAsyncLifetime
     
     private readonly PostgreSqlContainer _dbContainer =
         new PostgreSqlBuilder()
-            .WithDatabase("offerbox")
+            .WithDatabase("superhero")
             .WithUsername("postgres")
             .WithPassword("postgres")
             .Build();

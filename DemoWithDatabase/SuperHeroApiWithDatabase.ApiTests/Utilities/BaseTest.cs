@@ -1,6 +1,6 @@
 using SuperHeroApiWithDatabase.Data;
 
-namespace SuperHeroIntegrationTests.Utilities;
+namespace SuperHeroApiWithDatabase.ApiTests.Utilities;
 
 public abstract class BaseTest(CustomApiFactory factory)
 {

@@ -1,13 +1,12 @@
 using System.Net;
 using FluentAssertions;
+using SuperHeroApiWithDatabase.ApiTests.Utilities;
 using SuperHeroApiWithDatabase.Data.Models;
-using SuperHeroIntegrationTests.Utilities;
 
-namespace SuperHeroIntegrationTests;
+namespace SuperHeroApiWithDatabase.ApiTests;
 
 [Collection(nameof(IntegrationTestCollection))]
-public class SuperHeroApiTests(CustomApiFactory factory)
-    : BaseTest(factory), IClassFixture<CustomApiFactory>
+public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomApiFactory>
 {
     [Fact(DisplayName = "Get all superheros API returns all superheroes")]
     public async Task Get_All_SuperHeroes_Returns_List_Of_SuperHero()
