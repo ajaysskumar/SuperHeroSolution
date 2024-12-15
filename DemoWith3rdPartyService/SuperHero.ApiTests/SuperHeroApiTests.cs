@@ -70,10 +70,11 @@ public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomAp
     public async Task Get_All_Suspects_Returns_List_Of_Matching_Suspects()
     {
         // Arrange
+        // Setting up mocked data for success response
         SetupServiceMockForSuspectApi("1", new PersonResponse()
         {
-            Data = new List<Suspect>()
-            {
+            Data =
+            [
                 new Suspect()
                 {
                     Id = 1,
@@ -81,7 +82,7 @@ public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomAp
                     Last_Name = "Kyle",
                     Email = "selina.kyle@gotham.com",
                 }
-            }
+            ]
         });
         
         // Act
@@ -97,7 +98,29 @@ public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomAp
         superHeroes![0].Last_Name.Should().Be("Kyle");
     }
     
-    private void SetupServiceMockForSuspectApi<T>(string pageNum, T apiResponse)
+    [Fact(DisplayName = "Get suspects should return 500 status code when API responds with 500 status code")]
+    public async Task Get_All_Suspects_Should_Return_500_StatusCode_When_3rd_Party_Api_Fails()
+    {
+        // Arrange
+        // Setting up mocked data for failure response
+        SetupServiceMockForSuspectApi("1", new {Status = "Failed" }, HttpStatusCode.InternalServerError);
+        
+        // Act
+        var response = await factory.CreateClient().GetAsync("/suspects?searchTerm=selina");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+    }
+    
+    /// <summary>
+    /// This method will take params and will return the list of people/suspects
+    /// </summary>
+    /// <param name="pageNum">Number of page to look for. Can be any number, but for this problem, lets assume this will always be 1</param>
+    /// <param name="apiResponse">Response JSON returned by the API</param>
+    /// <param name="expectedStatusCode">Status code returned from the API</param>
+    /// <typeparam name="T">Type of the response</typeparam>
+    
+    private void SetupServiceMockForSuspectApi<T>(string pageNum, T apiResponse, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
     {
         factory.SharedFixture.WireMockServer
             .Given(Request
@@ -107,7 +130,7 @@ public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomAp
                 .WithParam("page", MatchBehaviour.AcceptOnMatch, ignoreCase: true, pageNum))
             .RespondWith(Response
                 .Create()
-                .WithStatusCode(HttpStatusCode.OK)
+                .WithStatusCode(expectedStatusCode)
                 .WithBodyAsJson(apiResponse, Encoding.UTF8));
     }
 }

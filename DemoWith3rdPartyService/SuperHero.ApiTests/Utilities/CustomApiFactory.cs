@@ -25,6 +25,7 @@ public class CustomApiFactory(SharedFixture sharedFixture) : WebApplicationFacto
                 opts.UseNpgsql(sharedFixture.DatabaseConnectionString));
         });
         
+        // Overriding app settings
         builder.ConfigureAppConfiguration((_, configBuilder) =>
         {
             configBuilder.AddInMemoryCollection(new Dictionary<string, string>
