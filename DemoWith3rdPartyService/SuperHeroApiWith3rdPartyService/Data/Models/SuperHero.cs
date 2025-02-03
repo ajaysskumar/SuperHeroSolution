@@ -1,4 +1,4 @@
-namespace SuperHeroApiWithDatabase.Data.Models;
+namespace SuperHeroApiWith3rdPartyService.Data.Models;
 
 public class SuperHero
 {

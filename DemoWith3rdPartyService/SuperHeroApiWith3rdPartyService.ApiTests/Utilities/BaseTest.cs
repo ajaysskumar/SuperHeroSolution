@@ -1,4 +1,4 @@
-using SuperHeroApiWithDatabase.Data;
+using SuperHeroApiWith3rdPartyService.Data;
 
 namespace SuperHero.ApiTests.Utilities;
 

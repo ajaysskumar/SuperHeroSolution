@@ -1,6 +1,6 @@
-using SuperHeroApiWithDatabase.Data.Models;
+using SuperHeroApiWith3rdPartyService.Data.Models;
 
-namespace SuperHeroApiWithDatabase.Data.Repos;
+namespace SuperHeroApiWith3rdPartyService.Data.Repos;
 
 public interface ISuperHeroRepository
 {

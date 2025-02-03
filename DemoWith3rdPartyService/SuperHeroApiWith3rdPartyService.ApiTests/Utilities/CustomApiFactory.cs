@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using SuperHeroApiWith3rdPartyService;
+using SuperHeroApiWith3rdPartyService.Data;
 using SuperHeroApiWithDatabase;
-using SuperHeroApiWithDatabase.Data;
 
 namespace SuperHero.ApiTests.Utilities;
 
@@ -11,6 +14,20 @@ public class CustomApiFactory(SharedFixture sharedFixture) : WebApplicationFacto
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.ConfigureTestServices(services =>
+        {
+            services.AddAuthentication(TestAuthHandler.SchemeName)
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
+
+            services.AddScoped(_ => new AuthClaimsProvider());
+        });
+        
+        builder.ConfigureLogging((_, loggingBuilder) =>
+        {
+            loggingBuilder.ClearProviders();
+            loggingBuilder.AddSimpleConsole(); // added to see logs in console
+        });
+        
         builder.ConfigureServices(services =>
         {
             var dbContextDescriptor = services.SingleOrDefault(

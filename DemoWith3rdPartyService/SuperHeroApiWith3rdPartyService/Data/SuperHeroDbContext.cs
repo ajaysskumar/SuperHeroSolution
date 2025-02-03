@@ -1,11 +1,7 @@
-using System.Configuration;
-using SuperHeroApiWithDatabase.Data.Models;
-
-namespace SuperHeroApiWithDatabase.Data;
-
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+using SuperHeroApiWith3rdPartyService.Data.Models;
+
+namespace SuperHeroApiWith3rdPartyService.Data;
 
 public class SuperHeroDbContext : DbContext
 {

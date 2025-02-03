@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SuperHeroApiWithDatabase.Data.Models;
-using SuperHeroApiWithDatabase.Data.Repos;
+using SuperHeroApiWith3rdPartyService.Data.Dto;
+using SuperHeroApiWith3rdPartyService.Data.Models;
+using SuperHeroApiWith3rdPartyService.Data.Repos;
 
-namespace SuperHeroApiWithDatabase.Controllers;
+namespace SuperHeroApiWith3rdPartyService.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -11,6 +13,13 @@ public class SuperHeroController(ISuperHeroRepository superHeroRepository, IConf
 {
     [HttpGet("")]
     public async Task<IEnumerable<SuperHero>> Get()
+    {
+        return await superHeroRepository.GetAllSuperHeroes();
+    }
+    
+    [HttpGet("private")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IEnumerable<SuperHero>> GetPrivate()
     {
         return await superHeroRepository.GetAllSuperHeroes();
     }

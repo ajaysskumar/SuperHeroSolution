@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace SuperHeroApiWithDatabase.Controllers;
+namespace SuperHeroApiWith3rdPartyService.Data.Dto;
 
 public class PersonResponse
 {

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using SuperHeroApiWithDatabase.Data.Models;
+using SuperHeroApiWith3rdPartyService.Data.Models;
 
-namespace SuperHeroApiWithDatabase.Data.Repos;
+namespace SuperHeroApiWith3rdPartyService.Data.Repos;
 
 public class SuperHeroRepository(SuperHeroDbContext context) : ISuperHeroRepository
 {

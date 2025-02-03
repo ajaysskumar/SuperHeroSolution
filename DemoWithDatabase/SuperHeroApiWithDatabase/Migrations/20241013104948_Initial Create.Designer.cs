@@ -24,7 +24,7 @@ namespace SuperHeroApiWithDatabase.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SuperHeroApiWithDatabase.Data.Models.SuperHero", b =>
+            modelBuilder.Entity("SuperHeroApiWith3rdPartyService.Data.Models.SuperHero", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

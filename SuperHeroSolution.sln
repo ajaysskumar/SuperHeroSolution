@@ -22,9 +22,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperHeroApiWithDatabase.Ap
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DemoWith3rdPartyService", "DemoWith3rdPartyService", "{6B6ED135-3B51-4620-971D-0DD09B3BBEA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperHeroApiWithDatabase", "DemoWith3rdPartyService\SuperHeroApiWithDatabase\SuperHeroApiWithDatabase.csproj", "{4256E15E-A02B-4746-9C93-BF5745A25CAB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperHeroApiWith3rdPartyService", "DemoWith3rdPartyService\SuperHeroApiWith3rdPartyService\SuperHeroApiWith3rdPartyService.csproj", "{4256E15E-A02B-4746-9C93-BF5745A25CAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperHero.ApiTests", "DemoWith3rdPartyService\SuperHero.ApiTests\SuperHero.ApiTests.csproj", "{35F0FE4B-3BC2-42B0-9C8D-822355D4245F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperHeroApiWith3rdPartyService.ApiTests", "DemoWith3rdPartyService\SuperHeroApiWith3rdPartyService.ApiTests\SuperHeroApiWith3rdPartyService.ApiTests.csproj", "{35F0FE4B-3BC2-42B0-9C8D-822355D4245F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1610E5F8-363B-429D-BC40-0975E14BD19F}"
 EndProject

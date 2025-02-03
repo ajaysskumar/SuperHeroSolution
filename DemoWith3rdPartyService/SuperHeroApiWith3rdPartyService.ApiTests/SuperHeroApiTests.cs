@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
 using SuperHero.ApiTests.Utilities;
-using SuperHeroApiWithDatabase.Controllers;
-using SuperHeroApiWithDatabase.Data.Models;
+using SuperHeroApiWith3rdPartyService.Data.Dto;
 using WireMock.Matchers;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -17,7 +17,7 @@ public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomAp
     public async Task Get_All_SuperHeroes_Returns_List_Of_SuperHero()
     {
         // Arrange
-        factory.SharedFixture.SuperHeroDbContext.SuperHero.AddRange(new List<SuperHeroApiWithDatabase.Data.Models.SuperHero>()
+        factory.SharedFixture.SuperHeroDbContext.SuperHero.AddRange(new List<SuperHeroApiWith3rdPartyService.Data.Models.SuperHero>()
         {
             new(1, "Batman","Bruce Wayne","Short distance fly,Common sense","Gotham", 40),
             new(2, "Superman", "Clark kent", "Fly, Shoot laser beam, Super strength, ice breath","Gotham", 42),
@@ -30,7 +30,52 @@ public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomAp
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var superHeroes = await response.Content.ReadFromJsonAsync<List<SuperHeroApiWithDatabase.Data.Models.SuperHero>>();
+        var superHeroes = await response.Content.ReadFromJsonAsync<List<SuperHeroApiWith3rdPartyService.Data.Models.SuperHero>>();
+        superHeroes.Should().NotBeEmpty();
+        superHeroes.Should().Contain(s => s.SuperName == "Batman");
+    }
+    
+    [Fact(DisplayName = "Get all superheroes private API returns 401 when request is unauthenticated")]
+    public async Task Get_All_SuperHeroes_Private_Returns_401_When_Request_Is_Unauthenticated()
+    {
+        // Act
+        using var httpClient = factory.CreateClient(); // Default http client without any token
+        var response = await httpClient.GetAsync("/SuperHero/private");
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+    
+    [Fact(DisplayName = "Get all superheroes private API returns 403 when request is missing required claims")]
+    public async Task Get_All_SuperHeroes_Private_Returns_403_When_Request_Is_Missing_Required_Claims()
+    {
+        // Act
+        using var httpClient = factory.CreateClientWithClaim(AuthClaimsProvider.WithAnonymousClaim()); // Default http client without any token
+        var response = await httpClient.GetAsync("/SuperHero/private");
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+    
+    [Fact(DisplayName = "Get all superheroes authenticated API returns all superheroes")]
+    public async Task Get_All_SuperHeroes_Authenticated_Returns_List_Of_SuperHero()
+    {
+        // Arrange
+        factory.SharedFixture.SuperHeroDbContext.SuperHero.AddRange(new List<SuperHeroApiWith3rdPartyService.Data.Models.SuperHero>()
+        {
+            new(11, "Batman","Bruce Wayne","Short distance fly,Common sense","Gotham", 40),
+            new(22, "Superman", "Clark kent", "Fly, Shoot laser beam, Super strength, ice breath","Gotham", 42),
+            new(33, "Robin", "John Blake", "Detective","Gotham", 35)
+        });
+        await factory.SharedFixture.SuperHeroDbContext.SaveChangesAsync();
+        
+        // Act
+        using var httpClient = factory.CreateClientWithClaim(AuthClaimsProvider.WithAdminClaim());
+        var response = await httpClient.GetAsync("/SuperHero/private");
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var superHeroes = await response.Content.ReadFromJsonAsync<List<SuperHeroApiWith3rdPartyService.Data.Models.SuperHero>>();
         superHeroes.Should().NotBeEmpty();
         superHeroes.Should().Contain(s => s.SuperName == "Batman");
     }
@@ -39,7 +84,7 @@ public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomAp
     public async Task Get_ById_SuperHero_Returns_SuperHero()
     {
         // Arrange
-        factory.SharedFixture.SuperHeroDbContext.SuperHero.AddRange(new List<SuperHeroApiWithDatabase.Data.Models.SuperHero>()
+        factory.SharedFixture.SuperHeroDbContext.SuperHero.AddRange(new List<SuperHeroApiWith3rdPartyService.Data.Models.SuperHero>()
         {
             new(4, "Flash","Barry Allen","Lightening fast","Missouri", 28),
         });
@@ -50,7 +95,7 @@ public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomAp
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var superHeroes = await response.Content.ReadFromJsonAsync<SuperHeroApiWithDatabase.Data.Models.SuperHero>();
+        var superHeroes = await response.Content.ReadFromJsonAsync<SuperHeroApiWith3rdPartyService.Data.Models.SuperHero>();
         superHeroes.Should().NotBeNull();
         superHeroes!.Id.Should().Be(4);
         superHeroes!.SuperName.Should().Be("Flash");
