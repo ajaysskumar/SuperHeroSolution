@@ -1,3 +1,4 @@
+using Amazon.SimpleNotificationService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SuperHeroApiWith3rdPartyService.Data.Dto;
@@ -8,7 +9,7 @@ namespace SuperHeroApiWith3rdPartyService.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class SuperHeroController(ISuperHeroRepository superHeroRepository, IConfiguration configuration)
+public class SuperHeroController(ISuperHeroRepository superHeroRepository, IAmazonSimpleNotificationService snsClient,  IConfiguration configuration)
     : ControllerBase
 {
     [HttpGet("")]
@@ -52,7 +53,7 @@ public class SuperHeroController(ISuperHeroRepository superHeroRepository, IConf
     }
 
     [HttpPost("call-superhero")]
-    public async Task<IActionResult> CallSuperHero([FromBody] string superHeroName)
+    public async Task<IActionResult> CallSuperHero(string superHeroName)
     {
         // Simulate calling a superhero
         var superHero = await superHeroRepository.GetAllSuperHeroes();
@@ -64,29 +65,29 @@ public class SuperHeroController(ISuperHeroRepository superHeroRepository, IConf
         }
 
         // Publish an SNS notification
-    var region = configuration.GetValue<string>("AWS:Region");
-    using var snsClient = new Amazon.SimpleNotificationService.AmazonSimpleNotificationServiceClient(Amazon.RegionEndpoint.GetBySystemName(region));
-    var topicArn = configuration.GetValue<string>("AWS:SnsTopicArn"); // Ensure this is configured in appsettings.json
-    var message = $"Calling {hero.SuperName}! They are on their way to save the day!";
-    var publishRequest = new Amazon.SimpleNotificationService.Model.PublishRequest
-    {
-        TopicArn = topicArn,
-        Message = message,
-        Subject = "Superhero Alert"
-    };
-
-    try
-    {
-        var response = await snsClient.PublishAsync(publishRequest);
-        if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
+        var region = configuration.GetValue<string>("AWS:Region");
+        var topicArn = configuration.GetValue<string>("AWS:SnsTopicArn"); // Ensure this is configured in appsettings.json
+        var message = $"Calling {hero.SuperName}! They are on their way to save the day!";
+        var publishRequest = new Amazon.SimpleNotificationService.Model.PublishRequest
         {
-            return StatusCode((int)response.HttpStatusCode, "Failed to send SNS notification.");
+            TopicArn = topicArn,
+            Message = message,
+            Subject = "Superhero Alert"
+        };
+        Console.WriteLine($"Publishing message to SNS topic {topicArn}");
+
+        try
+        {
+            var response = await snsClient.PublishAsync(publishRequest);
+            if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
+            {
+                return StatusCode((int)response.HttpStatusCode, "Failed to send SNS notification.");
+            }
         }
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, $"Error sending SNS notification: {ex.Message}");
-    }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error sending SNS notification: {ex.Message}");
+        }
 
         return Ok($"Calling {hero.SuperName}! They are on their way to save the day!");
     }

@@ -1,7 +1,7 @@
 using System.Net;
 using System.Text;
+using System.Text.Json.Nodes;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using SuperHero.ApiTests.Utilities;
 using SuperHeroApiWith3rdPartyService.Data.Dto;
 using WireMock.Matchers;
@@ -156,7 +156,40 @@ public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomAp
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
     }
-    
+
+    [Fact(DisplayName = "CallSuperHero API raises correct SNS notification using LocalStack")]
+    public async Task CallSuperHero_Raises_Correct_SNS_Notification_Using_LocalStack()
+    {
+        // Arrange
+        var superHeroName = "Batman";
+        await factory.SharedFixture.SuperHeroDbContext.SaveChangesAsync();
+
+        // Subscribe the SQS queue to the SNS topic
+        var queueName = "superhero-called-queue";
+        var queue = await factory.SharedFixture.LocalStackContainer.ExecAsync(["awslocal", "sqs", "create-queue", "--queue-name", queueName]);
+        var queueUrl = JsonNode.Parse(queue.Stdout)!["QueueUrl"]!.ToString();
+        var queueAttributeResult = await factory.SharedFixture.LocalStackContainer.ExecAsync(["awslocal", "sqs", "get-queue-attributes", "--queue-url", queueUrl, "--attribute-names", "All"]);
+        var queueArn = JsonNode.Parse(queueAttributeResult.Stdout)!["Attributes"]!["QueueArn"]!.ToString();
+        await factory.SharedFixture.LocalStackContainer.ExecAsync(["awslocal", "sns", "subscribe", "--topic-arn", factory.SharedFixture.SnsTopicArn, "--protocol", "sqs", "--notification-endpoint", queueArn]);
+
+        // Act
+        var response = await factory.CreateClient().PostAsJsonAsync($"/SuperHero/call-superhero?superHeroName={superHeroName}", new { });
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseMessage = await response.Content.ReadAsStringAsync();
+        responseMessage.Should().Contain($"Calling {superHeroName}! They are on their way to save the day!");
+
+        // Verify SNS message was published
+        var messages = await factory.SharedFixture.LocalStackContainer.ExecAsync(
+        [
+            "awslocal", "sqs", "receive-message", "--queue-url", queueUrl
+        ]);
+        var sqsMessages = JsonNode.Parse(messages.Stdout);
+        var message = sqsMessages!["Messages"]![0]!["Body"]!.ToString();
+        message.Should().Contain($"Calling {superHeroName}! They are on their way to save the day!");
+    }
+
     /// <summary>
     /// This method will take params and will return the list of people/suspects
     /// </summary>
@@ -164,7 +197,7 @@ public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomAp
     /// <param name="apiResponse">Response JSON returned by the API</param>
     /// <param name="expectedStatusCode">Status code returned from the API</param>
     /// <typeparam name="T">Type of the response</typeparam>
-    
+
     private void SetupServiceMockForSuspectApi<T>(string pageNum, T apiResponse, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
     {
         factory.SharedFixture.WireMockServer

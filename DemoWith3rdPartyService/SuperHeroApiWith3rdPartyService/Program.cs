@@ -1,4 +1,5 @@
 using System.Text;
+using Amazon.SimpleNotificationService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
@@ -43,9 +44,14 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+var snsClient =
+    new AmazonSimpleNotificationServiceClient(
+        Amazon.RegionEndpoint.GetBySystemName(configuration.GetValue<string>("AWS:Region")));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<ISuperHeroRepository, SuperHeroRepository>();
+builder.Services.AddSingleton<IAmazonSimpleNotificationService>(_ => snsClient);
 builder.Services.AddDbContext<SuperHeroDbContext>(opt =>
     opt.UseNpgsql(configuration.GetConnectionString("WebApiDatabase")));
 

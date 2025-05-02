@@ -1,3 +1,6 @@
+using Amazon;
+using Amazon.Runtime;
+using Amazon.SimpleNotificationService;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -30,6 +33,10 @@ public class CustomApiFactory(SharedFixture sharedFixture) : WebApplicationFacto
         
         builder.ConfigureServices(services =>
         {
+            var snsClient = services.SingleOrDefault(d => d.ServiceType == typeof(IAmazonSimpleNotificationService));
+            services.Remove(snsClient);
+            services.AddSingleton(GetSnsClient(new Uri(SharedFixture.LocalStackContainer.GetConnectionString())));
+
             var dbContextDescriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<SuperHeroDbContext>));
             services.Remove(dbContextDescriptor!);
@@ -45,10 +52,22 @@ public class CustomApiFactory(SharedFixture sharedFixture) : WebApplicationFacto
         // Overriding app settings
         builder.ConfigureAppConfiguration((_, configBuilder) =>
         {
+            Console.WriteLine($"SNS topic in config {sharedFixture.SnsTopicArn}");
             configBuilder.AddInMemoryCollection(new Dictionary<string, string>
             {
-                ["SuspectServiceUrl"] = sharedFixture.SuspectServiceUrlOverride
+                ["SuspectServiceUrl"] = sharedFixture.SuspectServiceUrlOverride,
+                ["AWS:SnsTopicArn"] = sharedFixture.SnsTopicArn
             }!);
         });
+    }
+
+    private IAmazonSimpleNotificationService GetSnsClient(Uri serviceUrl)
+    {
+        var credentials = new BasicAWSCredentials("keyId", "secret");
+        var clientConfig = new AmazonSimpleNotificationServiceConfig
+        {
+            ServiceURL = serviceUrl.ToString()
+        };
+        return new AmazonSimpleNotificationServiceClient(credentials, clientConfig);
     }
 }
