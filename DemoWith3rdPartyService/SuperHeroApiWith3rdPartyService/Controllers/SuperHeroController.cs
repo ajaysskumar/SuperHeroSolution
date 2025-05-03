@@ -59,11 +59,6 @@ public class SuperHeroController(ISuperHeroRepository superHeroRepository, IAmaz
         var superHero = await superHeroRepository.GetAllSuperHeroes();
         var hero = superHero.FirstOrDefault(h => h.SuperName.Equals(superHeroName, StringComparison.InvariantCultureIgnoreCase));
 
-        if (hero == null)
-        {
-            return NotFound($"Superhero with name '{superHeroName}' not found.");
-        }
-
         // Publish an SNS notification
         var topicArn = configuration.GetValue<string>("AWS:SnsTopicArn"); // Ensure this is configured in appsettings.json
         var message = $"Calling {hero.SuperName}! They are on their way to save the day!";
@@ -74,17 +69,10 @@ public class SuperHeroController(ISuperHeroRepository superHeroRepository, IAmaz
             Subject = "Superhero Alert"
         };
 
-        try
+        var response = await snsClient.PublishAsync(publishRequest);
+        if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
         {
-            var response = await snsClient.PublishAsync(publishRequest);
-            if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
-            {
-                return StatusCode((int)response.HttpStatusCode, "Failed to send SNS notification.");
-            }
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error sending SNS notification: {ex.Message}");
+            return StatusCode((int)response.HttpStatusCode, "Failed to send SNS notification.");
         }
 
         return Ok($"Calling {hero.SuperName}! They are on their way to save the day!");
