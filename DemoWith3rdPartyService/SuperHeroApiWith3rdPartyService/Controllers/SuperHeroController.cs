@@ -9,7 +9,7 @@ namespace SuperHeroApiWith3rdPartyService.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class SuperHeroController(ISuperHeroRepository superHeroRepository, IAmazonSimpleNotificationService snsClient,  IConfiguration configuration)
+public class SuperHeroController(ISuperHeroRepository superHeroRepository, IAmazonSimpleNotificationService snsClient, IConfiguration configuration)
     : ControllerBase
 {
     [HttpGet("")]
@@ -17,14 +17,14 @@ public class SuperHeroController(ISuperHeroRepository superHeroRepository, IAmaz
     {
         return await superHeroRepository.GetAllSuperHeroes();
     }
-    
+
     [HttpGet("private")]
     [Authorize(Roles = "Admin")]
     public async Task<IEnumerable<SuperHero>> GetPrivate()
     {
         return await superHeroRepository.GetAllSuperHeroes();
     }
-    
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -36,9 +36,9 @@ public class SuperHeroController(ISuperHeroRepository superHeroRepository, IAmaz
 
         return Ok(superHero);
     }
-    
+
     [HttpGet("/suspects")]
-    public async Task<IActionResult> Suspects([FromQuery]string searchTerm)
+    public async Task<IActionResult> Suspects([FromQuery] string searchTerm)
     {
         var people = await GetPeople();
         var peopleOfInterest = people.Data.Where(person =>
@@ -81,14 +81,14 @@ public class SuperHeroController(ISuperHeroRepository superHeroRepository, IAmaz
     private async Task<PersonResponse> GetPeople()
     {
         using var client = new HttpClient();
-        
+
         var url = $"{configuration.GetValue<string>("SuspectServiceUrl")}/api/users?page=1";
         var response = await client.GetAsync(url);
         if (!response.IsSuccessStatusCode)
         {
             throw new HttpRequestException($"Unable to get people from {url}");
         }
-            
+
         return await response.Content.ReadFromJsonAsync<PersonResponse>();
     }
 }
