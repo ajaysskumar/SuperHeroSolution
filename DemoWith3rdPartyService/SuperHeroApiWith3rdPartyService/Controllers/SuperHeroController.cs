@@ -65,7 +65,6 @@ public class SuperHeroController(ISuperHeroRepository superHeroRepository, IAmaz
         }
 
         // Publish an SNS notification
-        var region = configuration.GetValue<string>("AWS:Region");
         var topicArn = configuration.GetValue<string>("AWS:SnsTopicArn"); // Ensure this is configured in appsettings.json
         var message = $"Calling {hero.SuperName}! They are on their way to save the day!";
         var publishRequest = new Amazon.SimpleNotificationService.Model.PublishRequest
@@ -74,7 +73,6 @@ public class SuperHeroController(ISuperHeroRepository superHeroRepository, IAmaz
             Message = message,
             Subject = "Superhero Alert"
         };
-        Console.WriteLine($"Publishing message to SNS topic {topicArn}");
 
         try
         {

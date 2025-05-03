@@ -161,7 +161,11 @@ public class SuperHeroApiTests(CustomApiFactory factory): IClassFixture<CustomAp
     public async Task CallSuperHero_Raises_Correct_SNS_Notification_Using_LocalStack()
     {
         // Arrange
-        var superHeroName = "Batman";
+        var superHeroName = "Venom";
+        factory.SharedFixture.SuperHeroDbContext.SuperHero.AddRange(new List<SuperHeroApiWith3rdPartyService.Data.Models.SuperHero>()
+        {
+            new(5, "Venom", "Eddie Brock", "Super strength, Shape-shifting, Healing factor", "San Francisco", 35),
+        });
         await factory.SharedFixture.SuperHeroDbContext.SaveChangesAsync();
 
         // Subscribe the SQS queue to the SNS topic
