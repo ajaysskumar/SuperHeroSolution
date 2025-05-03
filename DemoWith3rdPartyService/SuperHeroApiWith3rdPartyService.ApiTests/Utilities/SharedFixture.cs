@@ -94,6 +94,7 @@ public class SharedFixture : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await _dbContainer.DisposeAsync();
+        await _localStackContainer.DisposeAsync();
     }
 
     /* Starting wiremock service and returning the mocked up server URL */
